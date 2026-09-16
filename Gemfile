@@ -67,9 +67,6 @@ group :development, :test do
   # Stub and set expectations on HTTP requests (avatar_url downloads in specs) [https://github.com/bblimke/webmock]
   gem "webmock"
 
-  # RSpec matchers and testing helpers for Inertia responses [https://github.com/skryukov/inertia_rails-contrib]
-  gem "inertia_rails-contrib"
-
   # Run the test suite across multiple CPUs [https://github.com/grosser/parallel_tests]
   gem "parallel_tests"
 end
