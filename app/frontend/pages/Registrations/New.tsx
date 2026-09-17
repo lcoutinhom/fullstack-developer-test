@@ -1,7 +1,10 @@
 import { Link, useForm } from "@inertiajs/react"
-import { SubmitEvent } from "react"
+import { ReactElement, SubmitEvent } from "react"
+import Field from "../../components/Field"
+import Layout from "../../components/Layout"
+import { cardClass, inputClass, linkClass, primaryButtonClass } from "../../components/styles"
 
-export default function New() {
+function New() {
   const { data, setData, post, processing, errors } = useForm({
     full_name: "",
     email: "",
@@ -15,57 +18,72 @@ export default function New() {
   }
 
   return (
-    <div>
-      <h1>Create your account</h1>
+    <div className="mx-auto max-w-sm">
+      <h1 className="text-2xl font-semibold text-gray-900">Create your account</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          required
-          autoFocus
-          autoComplete="name"
-          placeholder="Full name"
-          value={data.full_name}
-          onChange={(event) => setData("full_name", event.target.value)}
-        />
-        {errors.full_name && <div>{errors.full_name}</div>}
+      <form onSubmit={handleSubmit} className={`${cardClass} mt-6 space-y-4`}>
+        <Field label="Full name" error={errors.full_name}>
+          <input
+            type="text"
+            required
+            autoFocus
+            autoComplete="name"
+            className={inputClass}
+            value={data.full_name}
+            onChange={(event) => setData("full_name", event.target.value)}
+          />
+        </Field>
 
-        <input
-          type="email"
-          required
-          autoComplete="username"
-          placeholder="Enter your email address"
-          value={data.email}
-          onChange={(event) => setData("email", event.target.value)}
-        />
-        {errors.email && <div>{errors.email}</div>}
+        <Field label="Email address" error={errors.email}>
+          <input
+            type="email"
+            required
+            autoComplete="username"
+            className={inputClass}
+            value={data.email}
+            onChange={(event) => setData("email", event.target.value)}
+          />
+        </Field>
 
-        <input
-          type="password"
-          required
-          autoComplete="new-password"
-          placeholder="Choose a password"
-          maxLength={72}
-          value={data.password}
-          onChange={(event) => setData("password", event.target.value)}
-        />
-        <input
-          type="password"
-          required
-          autoComplete="new-password"
-          placeholder="Repeat password"
-          maxLength={72}
-          value={data.password_confirmation}
-          onChange={(event) => setData("password_confirmation", event.target.value)}
-        />
-        {errors.password && <div>{errors.password}</div>}
+        <Field label="Password" error={errors.password}>
+          <input
+            type="password"
+            required
+            autoComplete="new-password"
+            minLength={8}
+            maxLength={72}
+            className={inputClass}
+            value={data.password}
+            onChange={(event) => setData("password", event.target.value)}
+          />
+        </Field>
 
-        <button type="submit" disabled={processing}>
+        <Field label="Repeat password">
+          <input
+            type="password"
+            required
+            autoComplete="new-password"
+            maxLength={72}
+            className={inputClass}
+            value={data.password_confirmation}
+            onChange={(event) => setData("password_confirmation", event.target.value)}
+          />
+        </Field>
+
+        <button type="submit" disabled={processing} className={`${primaryButtonClass} w-full`}>
           Sign up
         </button>
       </form>
 
-      <Link href="/session/new">Already have an account?</Link>
+      <div className="mt-4">
+        <Link href="/session/new" className={linkClass}>
+          Already have an account?
+        </Link>
+      </div>
     </div>
   )
 }
+
+New.layout = (page: ReactElement) => <Layout>{page}</Layout>
+
+export default New

@@ -1,5 +1,7 @@
 import { Link, router, useForm } from "@inertiajs/react"
-import { SubmitEvent } from "react"
+import { ReactElement, SubmitEvent } from "react"
+import Layout from "../../../components/Layout"
+import { inputClass, linkClass, primaryButtonClass, secondaryButtonClass } from "../../../components/styles"
 
 type User = {
   id: number
@@ -14,7 +16,7 @@ type Pagination = {
   count: number
 }
 
-export default function Index({
+function Index({
   users,
   pagination,
   q,
@@ -42,53 +44,77 @@ export default function Index({
 
   return (
     <div>
-      <h1>Users</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
+        <div className="flex items-center gap-3">
+          <Link href="/admin/imports/new" className={secondaryButtonClass}>
+            Import users
+          </Link>
+          <Link href="/admin/users/new" className={primaryButtonClass}>
+            New user
+          </Link>
+        </div>
+      </div>
 
-      <Link href="/admin/users/new">New user</Link>
-      <Link href="/admin/imports/new">Import users</Link>
-
-      <form onSubmit={handleSearch}>
+      <form onSubmit={handleSearch} className="mt-6 flex max-w-sm gap-2">
         <input
           type="search"
           placeholder="Search by name or email"
+          className={inputClass}
           value={data.q}
           onChange={(event) => setData("q", event.target.value)}
         />
-        <button type="submit">Search</button>
+        <button type="submit" className={secondaryButtonClass}>
+          Search
+        </button>
       </form>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.full_name}</td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>
-                <Link href={`/admin/users/${user.id}/edit`}>Edit</Link>
-                <button type="button" onClick={() => handleToggleRole(user)}>
-                  Make {user.role === "admin" ? "user" : "admin"}
-                </button>
-                <button type="button" onClick={() => handleDelete(user)}>
-                  Delete
-                </button>
-              </td>
+      <div className="mt-6 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Name</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Email</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Role</th>
+              <th className="px-4 py-3" />
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td className="px-4 py-3 text-sm text-gray-900">{user.full_name}</td>
+                <td className="px-4 py-3 text-sm text-gray-500">{user.email}</td>
+                <td className="px-4 py-3 text-sm capitalize text-gray-500">{user.role}</td>
+                <td className="px-4 py-3 text-right text-sm">
+                  <div className="flex justify-end gap-3">
+                    <Link href={`/admin/users/${user.id}/edit`} className={linkClass}>
+                      Edit
+                    </Link>
+                    <button type="button" onClick={() => handleToggleRole(user)} className={linkClass}>
+                      Make {user.role === "admin" ? "user" : "admin"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(user)}
+                      className="text-sm font-medium text-red-600 hover:text-red-800"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <p>
+      <p className="mt-4 text-sm text-gray-500">
         Page {pagination.page} of {pagination.pages} ({pagination.count} users)
       </p>
     </div>
   )
 }
+
+Index.layout = (page: ReactElement) => <Layout>{page}</Layout>
+
+export default Index

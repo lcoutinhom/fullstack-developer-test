@@ -1,7 +1,10 @@
 import { useForm } from "@inertiajs/react"
-import { SubmitEvent } from "react"
+import { ReactElement, SubmitEvent } from "react"
+import Field from "../../components/Field"
+import Layout from "../../components/Layout"
+import { cardClass, inputClass, primaryButtonClass } from "../../components/styles"
 
-export default function New() {
+function New() {
   const { data, setData, post, processing } = useForm({ email: "" })
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
@@ -10,23 +13,30 @@ export default function New() {
   }
 
   return (
-    <div>
-      <h1>Forgot your password?</h1>
+    <div className="mx-auto max-w-sm">
+      <h1 className="text-2xl font-semibold text-gray-900">Forgot your password?</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          required
-          autoFocus
-          autoComplete="username"
-          placeholder="Enter your email address"
-          value={data.email}
-          onChange={(event) => setData("email", event.target.value)}
-        />
-        <button type="submit" disabled={processing}>
+      <form onSubmit={handleSubmit} className={`${cardClass} mt-6 space-y-4`}>
+        <Field label="Email address">
+          <input
+            type="email"
+            required
+            autoFocus
+            autoComplete="username"
+            className={inputClass}
+            value={data.email}
+            onChange={(event) => setData("email", event.target.value)}
+          />
+        </Field>
+
+        <button type="submit" disabled={processing} className={`${primaryButtonClass} w-full`}>
           Email reset instructions
         </button>
       </form>
     </div>
   )
 }
+
+New.layout = (page: ReactElement) => <Layout>{page}</Layout>
+
+export default New

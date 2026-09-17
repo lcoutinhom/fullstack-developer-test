@@ -1,5 +1,8 @@
 import { useForm } from "@inertiajs/react"
-import { SubmitEvent } from "react"
+import { ReactElement, SubmitEvent } from "react"
+import Field from "../../../components/Field"
+import Layout from "../../../components/Layout"
+import { cardClass, inputClass, primaryButtonClass } from "../../../components/styles"
 
 type User = {
   id: number
@@ -8,7 +11,7 @@ type User = {
   role: string
 }
 
-export default function Edit({ user }: { user: User }) {
+function Edit({ user }: { user: User }) {
   const { data, setData, patch, processing, errors } = useForm({
     full_name: user.full_name,
     email: user.email,
@@ -21,37 +24,47 @@ export default function Edit({ user }: { user: User }) {
   }
 
   return (
-    <div>
-      <h1>Edit user</h1>
+    <div className="mx-auto max-w-sm">
+      <h1 className="text-2xl font-semibold text-gray-900">Edit user</h1>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          required
-          value={data.full_name}
-          onChange={(event) => setData("full_name", event.target.value)}
-        />
-        {errors.full_name && <div>{errors.full_name}</div>}
+      <form onSubmit={handleSubmit} className={`${cardClass} mt-6 space-y-4`}>
+        <Field label="Full name" error={errors.full_name}>
+          <input
+            type="text"
+            required
+            className={inputClass}
+            value={data.full_name}
+            onChange={(event) => setData("full_name", event.target.value)}
+          />
+        </Field>
 
-        <input
-          type="email"
-          required
-          value={data.email}
-          onChange={(event) => setData("email", event.target.value)}
-        />
-        {errors.email && <div>{errors.email}</div>}
+        <Field label="Email address" error={errors.email}>
+          <input
+            type="email"
+            required
+            className={inputClass}
+            value={data.email}
+            onChange={(event) => setData("email", event.target.value)}
+          />
+        </Field>
 
-        <input
-          type="url"
-          placeholder="Avatar image URL (optional)"
-          value={data.avatar_url}
-          onChange={(event) => setData("avatar_url", event.target.value)}
-        />
+        <Field label="Avatar image URL (optional)">
+          <input
+            type="url"
+            className={inputClass}
+            value={data.avatar_url}
+            onChange={(event) => setData("avatar_url", event.target.value)}
+          />
+        </Field>
 
-        <button type="submit" disabled={processing}>
+        <button type="submit" disabled={processing} className={`${primaryButtonClass} w-full`}>
           Save
         </button>
       </form>
     </div>
   )
 }
+
+Edit.layout = (page: ReactElement) => <Layout>{page}</Layout>
+
+export default Edit
