@@ -88,6 +88,9 @@ group :test do
 
   # One-liner matchers for common Rails validations/associations [https://matchers.shoulda.io]
   gem "shoulda-matchers"
+
+  # Write .xlsx fixtures for the spreadsheet import specs (roo only reads) [https://github.com/caxlsx/caxlsx]
+  gem "caxlsx"
 end
 
 group :development do
