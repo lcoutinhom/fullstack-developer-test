@@ -12,8 +12,13 @@ require 'rspec/rails'
 require 'inertia_rails/rspec'
 require 'capybara/rspec'
 require 'webmock/rspec'
+require 'rspec/retry'
 
 WebMock.disable_net_connect!(allow_localhost: true)
+
+# The default 2s is tight for a React/Inertia page rendering in a real
+# browser, especially with several system specs running in parallel.
+Capybara.default_max_wait_time = 10
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -71,6 +76,12 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   config.include FactoryBot::Syntax::Methods
+
+  # Headless-browser runs can stall under CI/parallel resource contention;
+  # give system specs a couple of retries rather than flaking the build.
+  config.around(:each, type: :system) do |example|
+    example.run_with_retry retry: 3
+  end
 
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!

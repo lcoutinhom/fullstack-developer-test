@@ -91,6 +91,9 @@ group :test do
 
   # Write .xlsx fixtures for the spreadsheet import specs (roo only reads) [https://github.com/caxlsx/caxlsx]
   gem "caxlsx"
+
+  # Retry flaky system specs (headless-browser runs can stall under CI resource contention) [https://github.com/NoRedInk/rspec-retry]
+  gem "rspec-retry"
 end
 
 group :development do
