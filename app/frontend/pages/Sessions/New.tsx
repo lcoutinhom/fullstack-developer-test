@@ -42,6 +42,7 @@ export default function New() {
       </form>
 
       <Link href="/passwords/new">Forgot password?</Link>
+      <Link href="/registration/new">Create an account</Link>
     </div>
   )
 }

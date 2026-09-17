@@ -10,13 +10,21 @@ RSpec.describe "Sessions", type: :request do
   end
 
   describe "POST /session" do
-    it "logs the user in with correct credentials" do
+    it "redirects a regular user to their profile" do
       user = create(:user, password: "password123")
 
       post session_path, params: { email: user.email, password: "password123" }
 
-      expect(response).to redirect_to(root_url)
+      expect(response).to redirect_to(profile_url)
       expect(user.sessions.count).to eq(1)
+    end
+
+    it "redirects an admin to the admin dashboard" do
+      admin = create(:user, :admin, password: "password123")
+
+      post session_path, params: { email: admin.email, password: "password123" }
+
+      expect(response).to redirect_to(admin_dashboard_url)
     end
 
     it "rejects incorrect credentials" do

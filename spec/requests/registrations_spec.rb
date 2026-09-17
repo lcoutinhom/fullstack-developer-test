@@ -15,7 +15,7 @@ RSpec.describe "Registrations", type: :request do
         full_name: "Grace Hopper",
         email: "grace@example.com",
         password: "password123",
-        password_confirmation: "password123",
+        password_confirmation: "password123"
       }
 
       user = User.find_by(email: "grace@example.com")
@@ -31,7 +31,7 @@ RSpec.describe "Registrations", type: :request do
         email: "grace@example.com",
         password: "password123",
         password_confirmation: "password123",
-        role: "admin",
+        role: "admin"
       }
 
       expect(User.find_by(email: "grace@example.com")).to be_user
@@ -41,6 +41,7 @@ RSpec.describe "Registrations", type: :request do
       expect {
         post registration_path, params: { full_name: "", email: "", password: "short", password_confirmation: "short" }
       }.not_to change(User, :count)
+      follow_redirect!
 
       expect_inertia.to render_component("Registrations/New")
     end
