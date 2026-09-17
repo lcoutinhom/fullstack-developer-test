@@ -10,7 +10,7 @@ RSpec.describe Imports::SpreadsheetParser do
         { full_name: "Grace Hopper", email: "grace@example.com" },
         { full_name: "Ada Lovelace", email: "ada@example.com" },
         { full_name: "Missing Email", email: nil },
-        { full_name: "Katherine Johnson", email: "katherine@example.com" },
+        { full_name: "Katherine Johnson", email: "katherine@example.com" }
       ])
     end
   end

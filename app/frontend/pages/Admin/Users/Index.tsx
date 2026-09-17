@@ -45,6 +45,7 @@ export default function Index({
       <h1>Users</h1>
 
       <Link href="/admin/users/new">New user</Link>
+      <Link href="/admin/imports/new">Import users</Link>
 
       <form onSubmit={handleSearch}>
         <input
