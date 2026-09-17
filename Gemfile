@@ -34,6 +34,11 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# Pin below 3.0: json 3.0's JSON.parse dropped the positional options-hash argument
+# that activesupport 8.1.3.1 still calls it with, breaking signed cookies (e.g. sessions)
+# on Ruby 4.0.2. Remove once activesupport/json compatibility is restored upstream.
+gem "json", "~> 2.21"
+
 # Server-driven single-page apps: React frontend served via Rails controllers [https://inertia-rails.dev]
 gem "inertia_rails"
 # Vite integration for the JS/CSS build (React + Tailwind) [https://vite-ruby.netlify.app]
