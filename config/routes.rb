@@ -8,6 +8,9 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resource :dashboard, only: :show
+    resources :users do
+      member { patch :toggle_role }
+    end
   end
 
   # Redirect to localhost from 127.0.0.1 to use same IP address with Vite server

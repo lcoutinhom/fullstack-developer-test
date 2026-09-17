@@ -19,6 +19,16 @@ RSpec.describe "Passwords", type: :request do
       expect(response).to redirect_to(new_session_path)
     end
 
+    it "delivers the reset email to the user's address" do
+      user = create(:user)
+
+      perform_enqueued_jobs do
+        post passwords_path, params: { email: user.email }
+      end
+
+      expect(ActionMailer::Base.deliveries.last.to).to eq([ user.email ])
+    end
+
     it "does not error out for an unknown email address" do
       post passwords_path, params: { email: "nobody@example.com" }
 

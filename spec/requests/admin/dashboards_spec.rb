@@ -21,13 +21,15 @@ RSpec.describe "Admin::Dashboards", type: :request do
       expect(response).to redirect_to(profile_path)
     end
 
-    it "renders the dashboard for an admin" do
+    it "renders the dashboard with total and per-role user counts" do
       admin = create(:user, :admin)
+      create_list(:user, 2)
       sign_in(admin)
 
       get admin_dashboard_path
 
       expect_inertia.to render_component("Admin/Dashboard")
+      expect_inertia.to have_props(total: 3, by_role: { admin: 1, user: 2 })
     end
   end
 end

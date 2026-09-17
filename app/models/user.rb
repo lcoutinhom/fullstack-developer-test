@@ -11,6 +11,9 @@ class User < ApplicationRecord
     format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :full_name, presence: true
 
+  after_commit -> { DashboardBroadcaster.call }, on: %i[create destroy]
+  after_commit -> { DashboardBroadcaster.call }, on: :update, if: :saved_change_to_role?
+
   # Streams a remote image into avatar_image. Restricted to http(s) with a
   # size/time limit as a basic guard against SSRF and abusive uploads.
   def avatar_url=(url)
