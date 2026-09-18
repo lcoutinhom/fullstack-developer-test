@@ -4,4 +4,7 @@ require "bundler/setup"
 
 ARGV.unshift("--ensure-latest")
 
+ignore_file = File.expand_path("../config/brakeman.ignore", __dir__)
+ARGV.push("-i", ignore_file) if File.exist?(ignore_file)
+
 load Gem.bin_path("brakeman", "brakeman")

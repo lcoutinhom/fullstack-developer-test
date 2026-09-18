@@ -50,3 +50,65 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .tool-versions
+          cache: npm
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Prepare parallel test databases
+        run: bundle exec rake parallel:create parallel:load_schema
+
+      # vite.json has autoBuild: true for the test env, which compiles
+      # on-demand on first request. Building once, up front, means none of
+      # the runs below pay (or race each other on) that compile cost.
+      - name: Precompile test assets
+        run: RAILS_ENV=test bin/vite build
+
+      - name: Run models/requests/jobs/channels/services specs (parallel)
+        run: bundle exec parallel_rspec -n 2 spec/models spec/requests spec/jobs spec/channels spec/services
+
+      # One file per process, never in parallel with each other. A specific
+      # combination of system spec files sharing a process/browser left a
+      # later page's buttons completely inert (clicks never reached the
+      # server — confirmed via the Rails log), 100% reproducible with that
+      # file ordering and never in isolation; full root cause wasn't pinned
+      # down, but per-file isolation reliably avoids it. Only the last file
+      # sets ENFORCE_COVERAGE, checking SimpleCov's merged total from every
+      # run above instead of just its own slice.
+      - name: Run system specs (isolated per file)
+        run: |
+          files=(spec/system/*_spec.rb)
+          last=$((${#files[@]} - 1))
+          for i in "${!files[@]}"; do
+            echo "::group::${files[$i]}"
+            if [ "$i" -eq "$last" ]; then
+              ENFORCE_COVERAGE=true bundle exec rspec "${files[$i]}"
+            else
+              bundle exec rspec "${files[$i]}"
+            fi
+            echo "::endgroup::"
+          done
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+
