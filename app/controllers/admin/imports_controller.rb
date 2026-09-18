@@ -16,7 +16,7 @@ module Admin
     end
 
     def show
-      import = Import.find(params[:id])
+      import = Import.find(params.expect(:id))
       render inertia: "Admin/Imports/Show", props: { id: import.id, **import.progress }
     end
   end

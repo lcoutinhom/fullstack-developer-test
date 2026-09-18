@@ -32,12 +32,12 @@ module Admin
     end
 
     def edit
-      @user = User.find(params[:id])
+      @user = User.find(params.expect(:id))
       render inertia: "Admin/Users/Edit", props: { user: @user.as_json(only: %i[id full_name email role]) }
     end
 
     def update
-      user = User.find(params[:id])
+      user = User.find(params.expect(:id))
 
       if user.update(user_params)
         redirect_to admin_users_path, notice: "#{user.full_name} was updated."
@@ -47,13 +47,13 @@ module Admin
     end
 
     def destroy
-      user = User.find(params[:id])
+      user = User.find(params.expect(:id))
       user.destroy
       redirect_to admin_users_path, notice: "#{user.full_name} was deleted."
     end
 
     def toggle_role
-      user = User.find(params[:id])
+      user = User.find(params.expect(:id))
 
       if user == Current.user
         redirect_to admin_users_path, alert: "You cannot change your own role."
