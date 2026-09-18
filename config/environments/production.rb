@@ -46,6 +46,12 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
+  # Rails 8.1 enables YJIT by default outside local environments. This app runs
+  # with RUBYOPT=--zjit instead (see the Dockerfile and script/benchmark_zjit.rb);
+  # only one JIT can be active, so turn off Rails' auto-YJIT to avoid the boot
+  # warning and make the choice explicit.
+  config.yjit = false
+
   # Replace the default in-process memory cache store with a durable alternative.
   config.cache_store = :solid_cache_store
 
