@@ -74,21 +74,30 @@ on their profile; admins land on the dashboard.
 ## Running the tests
 
 ```bash
-bundle exec rspec                              # full suite, serially
+bundle exec rspec                              # full suite, serially (simplest for local dev)
 bundle exec rake parallel:create parallel:load_schema   # first time only
-bundle exec parallel_rspec -n 2 spec/           # in parallel (matches CI)
+bundle exec parallel_rspec -n 2 spec/models spec/requests spec/jobs spec/channels spec/services
+for f in spec/system/*_spec.rb; do bundle exec rspec "$f"; done   # see note below
 ```
 
 Coverage (via SimpleCov) must stay at or above 90% of lines or the run exits non-zero;
-the report is written to `coverage/index.html`. CI runs `rubocop`, `brakeman`,
-`bundler-audit`, and the full parallel test suite on every push/PR — see
-`.github/workflows/ci.yml`.
+the report is written to `coverage/index.html`. It's only *enforced* when
+`ENFORCE_COVERAGE=true` is set (CI sets it on the last command of a run) — otherwise a
+single file or a partial run just reports its (expectedly low) slice without failing.
+CI runs `rubocop`, `brakeman`, `bundler-audit`, and the full test suite on every push/PR
+— see `.github/workflows/ci.yml`.
 
 System specs boot a real headless Chrome via Selenium Manager (which downloads a
 matching browser/driver automatically — no local Chrome install required) and exercise
 the actual React UI, including the ActionCable-driven live dashboard and import-progress
-updates. They're capped at 2 parallel workers in CI; running more concurrently was
-observed to make headless-Chrome runs flaky under CPU contention.
+updates. **CI runs each system spec file in its own process, never in parallel with
+another system spec.** A specific combination of system spec files sharing a browser/
+process was found to leave a later page's buttons completely inert (clicks never
+reached the server — confirmed via the Rails log), 100% reproducible with that file
+ordering and never in isolation. The exact root cause wasn't pinned down despite a
+thorough investigation (ruled out: Selenium cold start, Puma thread exhaustion, CSRF,
+obscured elements, JS errors, Vite asset-compile races, and Inertia's encrypted-history
+sessionStorage); per-file isolation reliably avoids it.
 
 ## Docker
 
@@ -122,6 +131,17 @@ Parsed 50000 rows in ~0.335s (~149,000 rows/s)
 ~15% faster, consistent across repeated runs, no test failures with ZJIT enabled
 (`RUBYOPT="--zjit" bundle exec rspec`). Not enabled in development, since JIT warmup
 overhead isn't worth it for a process that reloads code on every request.
+
+## Extra-credit items from the test brief
+
+Done: Kamal 2 deploy config, Thruster as the production proxy, Ruby 4's ZJIT (see
+above). **Not done: SSR for the Inertia/React frontend.** The generator scaffolds an
+`inertia_ssr_head` tag in the layout, but nothing renders through it yet — pages are
+fully client-rendered. Wiring up real SSR (a Node-side render entrypoint, a running SSR
+process managed via inertia_rails' Puma plugin, and re-verifying every page renders
+identically server- and client-side) was judged too large a change to take on safely
+at this point versus the value it'd add for a test that's graded primarily on the
+required functionality.
 
 ## Notable decisions and trade-offs
 
