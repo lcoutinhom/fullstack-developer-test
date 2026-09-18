@@ -58,14 +58,7 @@ module Imports
       end
 
       def broadcast_progress(import)
-        ImportChannel.broadcast_to(import, {
-          status: import.status,
-          total_rows: import.total_rows,
-          processed_rows: import.processed_rows,
-          succeeded_rows: import.succeeded_rows,
-          failed_rows: import.failed_rows,
-          error_log: import.error_log
-        })
+        ImportChannel.broadcast_to(import, import.progress)
       end
   end
 end

@@ -17,20 +17,7 @@ module Admin
 
     def show
       import = Import.find(params[:id])
-      render inertia: "Admin/Imports/Show", props: import_props(import)
+      render inertia: "Admin/Imports/Show", props: { id: import.id, **import.progress }
     end
-
-    private
-      def import_props(import)
-        {
-          id: import.id,
-          status: import.status,
-          total_rows: import.total_rows,
-          processed_rows: import.processed_rows,
-          succeeded_rows: import.succeeded_rows,
-          failed_rows: import.failed_rows,
-          error_log: import.error_log
-        }
-      end
   end
 end

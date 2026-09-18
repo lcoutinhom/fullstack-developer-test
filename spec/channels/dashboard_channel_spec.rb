@@ -8,6 +8,14 @@ RSpec.describe DashboardChannel, type: :channel do
     expect(subscription).to have_stream_from("dashboard")
   end
 
+  it "transmits current counts immediately on subscribe, so a late-connecting client isn't stuck at 0" do
+    create(:user, :admin)
+
+    subscribe
+
+    expect(transmissions.last).to eq("total" => 1, "by_role" => { "admin" => 1, "user" => 0 })
+  end
+
   it "broadcasts updated counts when a user is created" do
     expect {
       create(:user)
